@@ -1,2 +1,2 @@
-# Social Media with Laravel / React
+# Social Media Backend with Laravel
 Comming soon ... 
