@@ -13,19 +13,19 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        if (Auth::attempt($request->only('email', 'password'))) {
-            /** @var User $user */
-            $user = Auth::user();
-            $token = $user->createToken('app')->accessToken;
-
-            return \response([
-                'token' => $token,
-            ]);
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response([
+                'message' => 'Invalid credentials!'
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
-        return \response([
-            'message' => 'Invalid username/password',
-        ], Response::HTTP_UNAUTHORIZED);
+        $user = Auth::user();
+        $token = $user->createToken('token')->plainTextToken;
+        $cookie = cookie('jwt', $token, 60 * 24); // 1 day
+
+        return response([
+            'message' => $token
+        ])->withCookie($cookie);
     }
 
     public function user(Request $request)
