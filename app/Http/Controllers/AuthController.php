@@ -12,8 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
-    private $cookie_key = 'jwt';
-
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
@@ -24,11 +22,10 @@ class AuthController extends Controller
 
         $user = Auth::user();
         $token = $user->createToken('token')->accessToken;
-        $cookie = cookie($this->cookie_key, $token, 60 * 24); // 1 day
 
         return response([
-            'message' => $token
-        ])->withCookie($cookie);
+            'token' => $token
+        ]);
     }
 
     public function user(Request $request)
@@ -46,14 +43,5 @@ class AuthController extends Controller
         ]);
 
         return $user;
-    }
-
-    public function logout()
-    {
-        $cookie = Cookie::forget($this->cookie_key);
-
-        return response([
-            'message' => 'Success',
-        ])->withCookie($cookie);
     }
 }
